@@ -1,5 +1,4 @@
-import globalCss from './style.css';
-
+import css from './style.css';
 
 let passkey = null; // You still can change this manually
 let username = null; // Same here
@@ -7,35 +6,38 @@ let username = null; // Same here
 // Get passkey and username from local storage
 passkey = GM_getValue('passkey', null);
 username = GM_getValue('username', null);
-
 if (unsafeWindow.location.href.match(/animebytes\.tv/))
   // check which site we are on to run the correct script
   animebytes();
 else anilist();
 
+document.head.append(VM.m(<style>{css}</style>));
 async function animebytes() {
-  document.head.append(VM.m(<style>{globalCss}</style>));
   const save = async (e) => {
     e.preventDefault();
     let passkey = document
       .querySelector("link[type='application/rss+xml']")
       .href.match(/\/feed\/rss_torrents_all\/(.*)/)[1];
-      let username = document.querySelector('.username').innerText;
-      await GM_setValue('passkey', passkey);
-      await GM_setValue('username', username);
-      alert('Passkey and username set you can now go to anilist!');
-      return false;
-  }
+    let username = document.querySelector('.username').innerText;
+    await GM_setValue('passkey', passkey);
+    await GM_setValue('username', username);
+    alert('Passkey and username set you can now go to anilist!');
+    return false;
+  };
   let element = (
     <div>
       <h3>AnilistBytes</h3>
       <ul class="nobullet">
         <li>
-          <a href="#" onclick={save} id="anilistbytes">{ !passkey && !username ? "Set Passkey & Username" : "Update Passkey & Username" }</a>
+          <a href="#" onclick={save} id="anilistbytes">
+            {!passkey && !username
+              ? 'Set Passkey & Username'
+              : 'Update Passkey & Username'}
+          </a>
         </li>
       </ul>
     </div>
-  )
+  );
   document.querySelector('#footer_inner').appendChild(VM.m(element));
 }
 
@@ -132,7 +134,7 @@ async function anilist() {
           </span>
           <span>{anime}</span>
         </h2>
-        <h2 style="display: grid; grid-template-columns: 1fr .5fr .5fr .5fr; grid-column-gap: 40px; text-align: center;">
+        <h2 class="animebytes stats">
           <span>{formatBytes(size)}</span>
           <span>{String(snatch)}</span>
           <span>{String(s)}</span>
@@ -163,6 +165,12 @@ async function anilist() {
             json: async () => JSON.parse(res.responseText),
           });
         },
+        onerror: (err) => {
+          reject(err);
+        },
+        onabort: (err) => {
+          reject(err);
+        },
       });
     });
   };
@@ -176,6 +184,7 @@ async function anilist() {
     await GM_setValue('sneedexv2', data);
     return data;
   };
+
   let sneedex = await GM_getValue('sneedexv2', await cacheSneedex());
 
   const formats = {
@@ -240,6 +249,7 @@ async function anilist() {
         )}`;
       console.log(`[AnilistBytes] Using api endpoint: ${endpoint}`);
       let res = await GM_get(endpoint);
+
       let el = clonableEl.cloneNode(true);
       el.className = 'animebytes';
       el.querySelector('h2').style =
@@ -313,53 +323,69 @@ async function anilist() {
           url: `https://animebytes.tv/torrents.php?id=${data.ID}`,
           icon: 'https://anilistbytes.notmarek.com/AB.svg',
         });
-
-      title.innerText = getDecodedString(data.FullName);
-      let a = document.createElement('a');
-      a.href = `https://animebytes.tv/torrents.php?id=${data.ID}`;
-      a.innerText = ' [AB]';
-      if (!perfectMatch) {
-        a.innerText += ' (imperfect match)';
-        a.title =
-          "Imperfect match means that the found anime may not be what you are looking for or that year/episode count/age rating simply don't match between anilist and AB.";
-      }
-      a.style = 'color: grey;';
-      a.target = '_blamk';
-      title.appendChild(a);
-      inside.appendChild(title);
-      let statsHeader = document.createElement('h2');
-      statsHeader.style =
-        'display: grid;grid-template-columns: 1fr .5fr .5fr .5fr;grid-column-gap: 40px;text-align: center;';
-      let size = document.createElement('span');
-      size.innerText = 'Size';
-      statsHeader.appendChild(size);
-      for (const x of [
-        'https://anilistbytes.notmarek.com/snatched.svg',
-        'https://anilistbytes.notmarek.com/seeders.svg',
-        'https://anilistbytes.notmarek.com/leechers.svg',
-      ]) {
-        let span = document.createElement('span');
-        let img = document.createElement('img');
-        img.src = x;
-        span.appendChild(img);
-        statsHeader.appendChild(span);
-      }
-      inside.appendChild(statsHeader);
-      for (const torrent of data.Torrents) {
-        let el = await createTorrentEntry(
-          torrent.Link,
-          torrent.Property,
-          torrent.Size,
-          torrent.Leechers,
-          torrent.Seeders,
-          torrent.Snatched,
-          torrent.RawDownMultiplier
-        );
-        console.log(el);
-        inside.appendChild(VM.m(el));
-      }
-
-      containerEl.insertBefore(el, clonableEl);
+      let entries = await Promise.all(
+        data.Torrents.map(async (torrent) => {
+          return await createTorrentEntry(
+            torrent.Link,
+            torrent.Property,
+            torrent.Size,
+            torrent.Leechers,
+            torrent.Seeders,
+            torrent.Snatched,
+            torrent.RawDownMultiplier
+          );
+        })
+      );
+      let element = (
+        <div class="animebytes">
+          <h2>AnilistBytes</h2>
+          <p class="description content-wrap">
+            <h2>
+              {getDecodedString(data.FullName)}
+              &nbsp;[
+              <a
+                href={`https://animebytes.tv/torrents.php?id=${data.ID}`}
+                style="color: gray;"
+                target="_blank"
+              >
+                AB
+              </a>
+              ]&nbsp;
+              {perfectMatch ? null : (
+                <span
+                  style="cursor: help; color: #ffaa00;"
+                  title="Imperfect match means that the found anime may not be what you are looking for or that year/episode count/age rating simply don't match between anilist and AB."
+                >
+                  (imperfect match)
+                </span>
+              )}
+            </h2>
+            <h2 class="animebytes stats">
+              <span>Size</span>
+              <span>
+                <img
+                  src="https://anilistbytes.notmarek.com/snatched.svg"
+                  alt="Snatches"
+                />
+              </span>
+              <span>
+                <img
+                  src="https://anilistbytes.notmarek.com/seeders.svg"
+                  alt="Seeders"
+                />
+              </span>
+              <span>
+                <img
+                  src="https://anilistbytes.notmarek.com/leechers.svg"
+                  alt="Leechers"
+                />
+              </span>
+            </h2>
+            {entries}
+          </p>
+        </div>
+      );
+      containerEl.insertBefore(VM.m(element), clonableEl);
     } else {
       // check every 500ms if the page has loaded, so we can load our data
       setTimeout(() => createTorrentList(), 500);

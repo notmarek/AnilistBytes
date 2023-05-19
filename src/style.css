@@ -1,8 +1,16 @@
-/* global css */
+#footer_inner .footer_column {
+  width: 180px;
+}
 
-#footer_inner .footer_column { width: 180px; }
+.animebytes > p {
+  display: grid;
+  grid-template-columns: 1fr 0.5fr;
+  grid-auto-columns: 1fr;
+}
 
-/* Put tailwind utility classes in the end */
-/* only uncomment it if you are using CSS in shadow DOM, otherwise the page styles may be affected.
-@tailwind utilities;
-*/
+h2.animebytes.stats {
+  display: grid;
+  grid-template-columns: 1fr 0.5fr 0.5fr 0.5fr;
+  grid-column-gap: 40px;
+  text-align: center;
+}

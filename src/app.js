@@ -397,13 +397,15 @@ async function anilist() {
     var pushState = history.pushState;
     history.pushState = function (_state) {
       const res = pushState.apply(history, arguments);
-      console.log(
-        `[AnilistBytes] Soft navigated to ${unsafeWindow.location.pathname}`
-      );
-      setTimeout(createTorrentList, 500);
+      unsafeWindow.dispatchEvent(new Event('popstate'));
       return res;
     };
   })(unsafeWindow.history);
-
+  unsafeWindow.addEventListener('popstate', () => {
+    console.log(
+      `[AnilistBytes] Soft navigated to ${unsafeWindow.location.pathname}`
+    );
+    setTimeout(createTorrentList, 500);
+  });
   createTorrentList();
 }

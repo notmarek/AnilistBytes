@@ -1,3 +1,6 @@
+import globalCss from './style.css';
+
+
 let passkey = null; // You still can change this manually
 let username = null; // Same here
 
@@ -11,38 +14,29 @@ if (unsafeWindow.location.href.match(/animebytes\.tv/))
 else anilist();
 
 async function animebytes() {
-  let footerCol = document.createElement('div');
-  footerCol.className = 'footer_column';
-  let colTitle = document.createElement('h3');
-  colTitle.innerText = 'AnilistBytes';
-  footerCol.appendChild(colTitle);
-  let colContent = document.createElement('ul');
-  colContent.className = 'nobullet';
-  let row = document.createElement('li');
-  let btn = document.createElement('a');
-  btn.innerText =
-    passkey === null || username == null
-      ? 'Set Passkey & Username'
-      : 'Update Passkey & Username';
-  btn.href = '#';
-  btn.addEventListener('click', async (e) => {
+  document.head.append(VM.m(<style>{globalCss}</style>));
+  const save = async (e) => {
     e.preventDefault();
     let passkey = document
       .querySelector("link[type='application/rss+xml']")
       .href.match(/\/feed\/rss_torrents_all\/(.*)/)[1];
-    let username = document.querySelector('.username').innerText;
-    await GM_setValue('passkey', passkey);
-    await GM_setValue('username', username);
-    alert('Passkey and username set you can now go to anilist!');
-    return false;
-  });
-  row.appendChild(btn);
-  colContent.appendChild(row);
-  footerCol.appendChild(colContent);
-  let style = document.createElement('style');
-  style.innerText = `#footer_inner .footer_column { width: 180px; }`;
-  document.head.appendChild(style);
-  document.querySelector('#footer_inner').appendChild(footerCol);
+      let username = document.querySelector('.username').innerText;
+      await GM_setValue('passkey', passkey);
+      await GM_setValue('username', username);
+      alert('Passkey and username set you can now go to anilist!');
+      return false;
+  }
+  let element = (
+    <div>
+      <h3>AnilistBytes</h3>
+      <ul class="nobullet">
+        <li>
+          <a href="#" onclick={save} id="anilistbytes">{ !passkey && !username ? "Set Passkey & Username" : "Update Passkey & Username" }</a>
+        </li>
+      </ul>
+    </div>
+  )
+  document.querySelector('#footer_inner').appendChild(VM.m(element));
 }
 
 async function getMALId(id, type, isAdult = false) {
@@ -372,10 +366,10 @@ async function anilist() {
     }
   };
 
-  // hijack the windo.history.pushState function to do shit for us on navigation
+  // hijack the window.history.pushState function to do shit for us on navigation
   (function (history) {
     var pushState = history.pushState;
-    history.pushState = function (state) {
+    history.pushState = function (_state) {
       const res = pushState.apply(history, arguments);
       console.log(
         `[AnilistBytes] Soft navigated to ${unsafeWindow.location.pathname}`

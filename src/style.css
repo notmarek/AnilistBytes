@@ -1,6 +1,6 @@
 /* global css */
 
-
+#footer_inner .footer_column { width: 180px; }
 
 /* Put tailwind utility classes in the end */
 /* only uncomment it if you are using CSS in shadow DOM, otherwise the page styles may be affected.

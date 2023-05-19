@@ -3,8 +3,8 @@
 // @match       https://anilist.co/*
 // @match       https://animebytes.tv/*
 // @grant       GM.xmlHttpRequest
-// @grant       GM_getValue
-// @grant       GM_setValue
+// @grant       GM.getValue
+// @grant       GM.setValue
 // @run-at      document-end
 // @version     process.env.VERSION
 // @author      process.env.AUTHOR

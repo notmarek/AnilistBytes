@@ -3,7 +3,8 @@ import * as ui from '@violentmonkey/ui';
 
 declare global {
   const VM: typeof dom & typeof ui;
-
+  const GM: any;
+  const unsafeWindow: Window & typeof globalThis;
   namespace JSX {
     /**
      * JSX.Element can be different based on pragma in babel config:

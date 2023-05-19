@@ -4,8 +4,8 @@ let passkey = null; // You still can change this manually
 let username = null; // Same here
 
 // Get passkey and username from local storage
-passkey = GM_getValue('passkey', null);
-username = GM_getValue('username', null);
+passkey = GM.getValue('passkey', null);
+username = GM.getValue('username', null);
 if (unsafeWindow.location.href.match(/animebytes\.tv/))
   // check which site we are on to run the correct script
   animebytes();
@@ -19,8 +19,8 @@ async function animebytes() {
       .querySelector("link[type='application/rss+xml']")
       .href.match(/\/feed\/rss_torrents_all\/(.*)/)[1];
     let username = document.querySelector('.username').innerText;
-    await GM_setValue('passkey', passkey);
-    await GM_setValue('username', username);
+    await GM.setValue('passkey', passkey);
+    await GM.setValue('username', username);
     alert('Passkey and username set you can now go to anilist!');
     return false;
   };
@@ -181,11 +181,11 @@ async function anilist() {
     data = data
       .map((e) => e.permLinks.map((e) => e.match(/torrentid=(\d+)/)[1]))
       .flat();
-    await GM_setValue('sneedexv2', data);
+    await GM.setValue('sneedexv2', data);
     return data;
   };
 
-  let sneedex = await GM_getValue('sneedexv2', await cacheSneedex());
+  let sneedex = await GM.getValue('sneedexv2', await cacheSneedex());
 
   const formats = {
     MANGA: 'Manga',
@@ -199,7 +199,9 @@ async function anilist() {
     // Cleanup exising elements
     try {
       document.querySelectorAll('.animebytes').forEach((e) => e.remove());
-    } catch {}
+    } catch {
+      null;
+    }
     let type = unsafeWindow.location.pathname.match(/\/(anime|manga)\/[0-9]/);
     if (type === null) {
       return;
@@ -249,17 +251,6 @@ async function anilist() {
         )}`;
       console.log(`[AnilistBytes] Using api endpoint: ${endpoint}`);
       let res = await GM_get(endpoint);
-
-      let el = clonableEl.cloneNode(true);
-      el.className = 'animebytes';
-      el.querySelector('h2').style =
-        'display: flex;align-content: center; text-align: center;align-items: center;';
-      el.querySelector('h2').innerHTML = 'AnimeBytes';
-      let inside = el.querySelector('.description');
-      inside.innerText = null;
-      inside.style =
-        'display: grid;grid-template-columns: 1fr 0.5fr;grid-auto-columns: 1fr;';
-      let title = document.createElement('h2');
       if (!mal_id) {
         mal_id = await getMALId(
           vueMyBeloved.media.id,
@@ -268,7 +259,6 @@ async function anilist() {
         );
       }
       let ab_groups = (await res.json()).Groups;
-      // ab_groups[0];
       if (!ab_groups) {
         if (perfectMatch && title_type < 3) {
           console.log(

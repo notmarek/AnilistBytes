@@ -4,8 +4,7 @@ let passkey = null; // You still can change this manually
 let username = null; // Same here
 
 // Get passkey and username from local storage
-passkey = GM.getValue('passkey', null);
-username = GM.getValue('username', null);
+
 if (unsafeWindow.location.href.match(/animebytes\.tv/))
   // check which site we are on to run the correct script
   animebytes();
@@ -13,6 +12,8 @@ else anilist();
 
 document.head.append(VM.m(<style>{css}</style>));
 async function animebytes() {
+  passkey = await GM.getValue('passkey', null);
+  username = await GM.getValue('username', null);
   const save = async (e) => {
     e.preventDefault();
     let passkey = document
@@ -59,6 +60,8 @@ async function getMALId(id, type, isAdult = false) {
 }
 
 async function anilist() {
+  passkey = await GM.getValue('passkey', null);
+  username = await GM.getValue('username', null);
   if (passkey === null || username === null) {
     alert(
       'Make sure to press the button in the footer of animebytes or edit the script to set your passkey and username!'

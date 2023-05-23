@@ -108,15 +108,14 @@ async function anilist() {
         alt="| Sneedex"
       />
     );
-    let anime =
-      downMultipler === 0 ? (
-        <>
-          {name.replace('| Freeleech', '')}
-          {flicon}
-        </>
-      ) : (
-        <>{name}</>
-      );
+    let anime = name.includes('| Freeleech') ? (
+      <>
+        {name.replace('| Freeleech', '')}
+        {flicon}
+      </>
+    ) : (
+      <>{name}</>
+    );
     anime = sneedex.includes(link.match(/torrent\/(\d+)\/download/)[1]) ? (
       <>
         {anime}

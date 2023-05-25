@@ -90,7 +90,15 @@ async function anilist() {
     let st = (
       <>
         &nbsp;|&nbsp;
-        <a style="color:gray;" href={link}>
+        <a
+          style="color:gray;"
+          href=""
+          onclick={(e) => {
+            unsafeWindow._addTo(link);
+            e.target.innerText = 'Added!';
+            return false;
+          }}
+        >
           ST
         </a>
       </>
@@ -132,7 +140,7 @@ async function anilist() {
             <a href={link} style="color:gray;">
               &nbsp;DL
             </a>
-            {st}&nbsp;]&nbsp;
+            {unsafeWindow._addTo ? st : null}&nbsp;]&nbsp;
           </span>
           <span>{anime}</span>
         </h2>

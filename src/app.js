@@ -73,9 +73,8 @@ async function anilist() {
     if (!+a) return '0 Bytes';
     const c = 0 > b ? 0 : b,
       d = Math.floor(Math.log(a) / Math.log(1024));
-    return `${parseFloat((a / Math.pow(1024, d)).toFixed(c))} ${
-      ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'][d]
-    }`;
+    return `${parseFloat((a / Math.pow(1024, d)).toFixed(c))} ${['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'][d]
+      }`;
   }
 
   const createTorrentEntry = (
@@ -250,11 +249,10 @@ async function anilist() {
         hentai
       )}&epcount=${epcount}&year=${seriesYear}&type=anime&searchstr=${encodeURIComponent(
         seriesName
-      )}${
-        type == 'manga'
+      )}${type == 'manga'
           ? '&printedtype[' + formats[vueMyBeloved.media.format] + ']=1'
           : ''
-      }`;
+        }`;
       if (!perfectMatch)
         endpoint = `https://animebytes.tv/scrape.php?torrent_pass=${passkey}&username=${username}&hentai=2&type=anime&searchstr=${encodeURIComponent(
           seriesName
@@ -272,15 +270,13 @@ async function anilist() {
       if (!ab_groups) {
         if (perfectMatch && title_type < 3) {
           console.log(
-            `[AnilistBytes] Perfect match for ${
-              types[title_type]
+            `[AnilistBytes] Perfect match for ${types[title_type]
             } title failed, trying ${types[title_type + 1]} title`
           );
           return await createTorrentList(true, title_type + 1, mal_id);
         } else if (!perfectMatch && title_type < 3) {
           console.log(
-            `[AnilistBytes] Imperfect match for ${
-              types[title_type]
+            `[AnilistBytes] Imperfect match for ${types[title_type]
             } title failed, trying ${types[title_type + 1]} title`
           );
           return await createTorrentList(false, title_type + 1, mal_id);
@@ -291,6 +287,16 @@ async function anilist() {
           return await createTorrentList(false, 0);
         } else {
           console.log('[AnilistBytes] No match found giving up.');
+          vueMyBeloved.$children
+            .find((e) => e.$options._componentTag == 'external-links')
+            ._props.links.push({
+              color: '#ed106a',
+              site: 'AnimeBytes [Search]',
+              url: `https://animebytes.tv/torrents.php?searchstr=${encodeURIComponent(
+                seriesName
+              )}`,
+              icon: 'https://anilistbytes.notmarek.com/AB.svg',
+            });
           return;
         }
       }

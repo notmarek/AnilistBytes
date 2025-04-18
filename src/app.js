@@ -250,8 +250,8 @@ async function anilist() {
       )}&epcount=${epcount}&year=${seriesYear}&type=anime&searchstr=${encodeURIComponent(
         seriesName
       )}${type == 'manga'
-          ? '&printedtype[' + formats[vueMyBeloved.media.format] + ']=1'
-          : ''
+        ? '&printedtype[' + formats[vueMyBeloved.media.format] + ']=1'
+        : ''
         }`;
       if (!perfectMatch)
         endpoint = `https://animebytes.tv/scrape.php?torrent_pass=${passkey}&username=${username}&hentai=2&type=anime&searchstr=${encodeURIComponent(
@@ -293,7 +293,10 @@ async function anilist() {
               color: '#ed106a',
               site: 'AnimeBytes [Search]',
               url: `https://animebytes.tv/torrents.php?searchstr=${encodeURIComponent(
-                seriesName
+                vueMyBeloved.media.title[types[1]].replaceAll(
+                  /[\]\[]/g,
+                  ''
+                )
               )}`,
               icon: 'https://anilistbytes.notmarek.com/AB.svg',
             });

@@ -159,10 +159,14 @@ async function anilist() {
     txt.innerHTML = str;
     return txt.value;
   };
-
+  var requestCache = new Map();
   // function using GM.xmlHttpRequest to make the xmlhttprequest closer to fetch
   const GM_get = async (url) => {
     return new Promise((resolve, reject) => {
+      if (requestCache.has(url)) {
+        console.log(`[AnilistBytes] Request to ${url} served from cache.`);
+        resolve({ json: async () => requestCache.get(url) });
+      }
       GM.xmlHttpRequest({
         method: 'GET',
         url,
@@ -170,8 +174,10 @@ async function anilist() {
           Accept: 'application/json',
         },
         onload: (res) => {
+          const result = JSON.parse(res.responseText);
+          requestCache.set(url, result);
           resolve({
-            json: async () => JSON.parse(res.responseText),
+            json: async () => result,
           });
         },
         onerror: (err) => {

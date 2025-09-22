@@ -250,8 +250,11 @@ async function anilist() {
       const seriesYear =
         vueMyBeloved.media.seasonYear ?? vueMyBeloved.media.startDate?.year;
       let clonableEl = containerEl.querySelector('div .description-wrap');
-      if (clonableEl === null) setTimeout(createTorrentList, 500);
-
+      if (clonableEl === null) {
+        setTimeout(createTorrentList, 500);
+        return
+      }
+      
       let endpoint = `https://animebytes.tv/scrape.php?torrent_pass=${passkey}&username=${username}&hentai=${Number(
         hentai
       )}&epcount=${epcount}&year=${seriesYear}&type=anime&searchstr=${encodeURIComponent(

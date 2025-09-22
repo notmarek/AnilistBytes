@@ -166,6 +166,7 @@ async function anilist() {
       if (requestCache.has(url)) {
         console.log(`[AnilistBytes] Request to ${url} served from cache.`);
         resolve({ json: async () => requestCache.get(url) });
+        return;
       }
       GM.xmlHttpRequest({
         method: 'GET',

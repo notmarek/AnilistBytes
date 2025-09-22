@@ -2,7 +2,7 @@ import css from './style.css';
 
 let passkey = null; // You still can change this manually
 let username = null; // Same here
-
+let requestCache = new Map(); 
 // Get passkey and username from local storage
 
 if (unsafeWindow.location.href.match(/animebytes\.tv/))
@@ -159,7 +159,7 @@ async function anilist() {
     txt.innerHTML = str;
     return txt.value;
   };
-  var requestCache = new Map();
+
   // function using GM.xmlHttpRequest to make the xmlhttprequest closer to fetch
   const GM_get = async (url) => {
     return new Promise((resolve, reject) => {
